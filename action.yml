@@ -1,0 +1,52 @@
+name: 'Local UNZIP'
+description: 'Unzip an Node Artifact'
+inputs:
+  production:
+    description: 'Is this a production build?'
+    required: true
+    default: 'true'
+  addIgnore:
+    description: 'Add Ignore?'
+    required: true
+    default: 'true'
+  ignore:
+    description: 'Ignore Files'
+    required: true
+    default: '/source\n/src\n/database\n'
+  branch:
+    description: 'Branch to checkout files from'
+    required: true
+    default: main
+runs:
+  using: "composite"
+  steps:
+  - name: GET VERSION
+    id: package-version
+    uses: martinbeentjes/npm-get-version-action@main
+  - name: 'Set Production:'
+    run: echo "PROD=$(${{ inputs.production == 'true' }} && echo '' || echo '-s')" >> $GITHUB_ENV
+    shell: bash
+  - name: Add Ignore
+    if: ${{ inputs.addIgnore == 'true' }}
+    run: echo -e '${{ steps.package-version.outputs.current-version }}*\n${{ inputs.ignore }}' >> .npmignore
+    shell: bash
+  - name: Print
+    run: ls
+    shell: bash
+  - name: Print ${{ steps.package-version.outputs.current-version }}
+    run: ls ${{ steps.package-version.outputs.current-version }}
+    shell: bash
+  - name: Extract some files
+    uses: DuckSoft/extract-7z-action@master
+    with:
+      pathSource: "${{ steps.package-version.outputs.current-version }}${{ env.PROD }}/${{ steps.package-version.outputs.current-version }}${{ env.PROD }}.zip"
+      pathTarget: "."
+      recursive: false
+    # run: 7z x ${{ steps.package-version.outputs.current-version }}${{ env.PROD }}/${{ steps.package-version.outputs.current-version }}${{ env.PROD }}.zip -aoa
+    # shell: bash
+  - name: Print end
+    run: ls
+    shell: bash
+  - name: Print ${{ steps.package-version.outputs.current-version }} end
+    run: ls ${{ steps.package-version.outputs.current-version }}
+    shell: bash
