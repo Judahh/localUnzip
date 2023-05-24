@@ -45,12 +45,6 @@ runs:
   - name: Go To
     run: cd ${{ inputs.goTo }}
     shell: bash
-  - name: Print
-    run: ls
-    shell: bash
-  - name: PWD
-    run: pwd
-    shell: bash
   - name: Extract some files
     if: ${{ inputs.useSystem != 'true' }}
     uses: DuckSoft/extract-7z-action@master
@@ -62,7 +56,7 @@ runs:
     # shell: bash
   - name: Extract some files
     if: ${{ inputs.useSystem == 'true' }}
-    run: unzip $(${{ inputs.replace == 'true' }} && echo '-o' || echo '') ${{ steps.package-version.outputs.current-version }}${{ env.PROD }}.zip
+    run: cd ${{ inputs.goTo }} && unzip $(${{ inputs.replace == 'true' }} && echo '-o' || echo '') ${{ steps.package-version.outputs.current-version }}${{ env.PROD }}.zip
     shell: bash
   - name: Print end
     run: ls
