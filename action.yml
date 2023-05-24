@@ -25,6 +25,10 @@ inputs:
     description: 'replace files'
     required: true
     default: 'true'
+  goTo:
+    description: 'cd to'
+    required: true
+    default: '.'
 runs:
   using: "composite"
   steps:
@@ -38,8 +42,14 @@ runs:
     if: ${{ inputs.addIgnore == 'true' }}
     run: echo -e '${{ steps.package-version.outputs.current-version }}*\n${{ inputs.ignore }}' >> .npmignore
     shell: bash
+  - name: Go To
+    run: cd ${{ inputs.goTo }}
+    shell: bash
   - name: Print
     run: ls
+    shell: bash
+  - name: PWD
+    run: pwd
     shell: bash
   - name: Extract some files
     if: ${{ inputs.useSystem != 'true' }}
